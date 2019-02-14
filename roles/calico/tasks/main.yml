@@ -32,6 +32,13 @@
     
     - name: 配置 calico rbac
       template: src=calico-rbac.yaml.j2 dest=/opt/kube/kube-system/calico/calico-rbac.yaml
+  
+    - name: 修改calico-key.pem o+r 权限，方便分发
+      file: path=/etc/calico/ssl/{{ item }} mode="o+r"
+      with_items:
+      - calico-key.pem
+      when: "'SUDO_USER' in ansible_env"
+  
   delegate_to: "{{ groups.deploy[0] }}"
   run_once: true
     

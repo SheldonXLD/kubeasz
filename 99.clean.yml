@@ -202,3 +202,10 @@
     - 'kubeasz'
     - 'helm'
     - 'kubectl completion'
+
+  - name: clean tmp .kube/config
+    file: name={{ item }} state=absent
+    with_items:
+    - "{{ ansible_env['PWD'] }}/.kube/"
+    when: "'SUDO_USER' in ansible_env"
+    ignore_errors: true

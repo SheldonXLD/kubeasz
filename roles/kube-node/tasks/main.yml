@@ -19,7 +19,7 @@
   tags: upgrade_k8s
 
 - name: 分发 kubeconfig配置文件
-  synchronize: src=/root/.kube/config dest=/root/.kube/config
+  synchronize: src={{ ansible_env['PWD'] }}/.kube/config dest=/root/.kube/config
   delegate_to: "{{ groups.deploy[0] }}"
 
 - name: 添加 kubectl 命令自动补全
@@ -75,7 +75,7 @@
 	--kubeconfig=kubelet.kubeconfig"
 
 - name: 移动 kubelet.kubeconfig
-  shell: "mv /root/kubelet.kubeconfig /etc/kubernetes/"
+  shell: "mv {{ ansible_env['PWD'] }}/kubelet.kubeconfig /etc/kubernetes/"
 
 - name: 准备 cni配置文件
   template: src=cni-default.conf.j2 dest=/etc/cni/net.d/10-default.conf

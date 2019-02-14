@@ -1,0 +1,21 @@
+# --- 以下为兼容ansible -b 运行的情况
+# 修改一些文件的o+r权限，方便分发
+- name: 修改ca-key, admin-key 的 o+r 权限
+  file: path={{ ca_dir }}/{{ item }} mode="o+r"
+  with_items:
+  - ca-key.pem
+  - admin-key.pem
+
+- name: 修改 kube-proxy.kubeconfig 的 o+r 权限
+  file: path=/etc/kubernetes/kube-proxy.kubeconfig mode="o+r"
+
+- name: 创建.kube目录
+  file: name={{ item }} state=directory
+  with_items:
+  - "{{ ansible_env['PWD'] }}/.kube"
+
+- name: 复制 /root/.kube/config 到 PWD 目录方便分发
+  shell: "cp /root/.kube/config {{ ansible_env['PWD'] }}/.kube/config"
+
+- name: ./kube/config 文件赋o+r权限
+  file: path={{ ansible_env['PWD'] }}/.kube/config mode="o+r"

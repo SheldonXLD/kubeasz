@@ -16,6 +16,12 @@
     - "{{ base_dir }}/roles/cluster-backup/files/hosts"   
     - "{{ base_dir }}/roles/cluster-backup/files/snapshot"   
 
+  - name: Change ca-key.pem's o+r attribute to make copy available
+    file: path={{ ca_dir }}/{{ item }} mode="o+r"
+    with_items:
+    - ca-key.pem
+    when: "'SUDO_USER' in ansible_env"
+
   - name: Backing up CA sth
     copy:
       src: "{{ ca_dir }}/{{ item }}"

@@ -7,6 +7,7 @@
 - hosts: deploy
   roles:
   - deploy
+  - { role: deploy_no_root, when: "'SUDO_USER' in ansible_env" }
 
 # prepare tasks for all nodes
 - hosts:
@@ -72,5 +73,11 @@
 - hosts:
   - kube-node
   roles:
-  - cluster-addon 
+  - cluster-addon
 
+# restore private files permission
+- hosts:
+  - kube-master
+  - kube-node
+  roles:
+  - { role: post_no_root, when: "'SUDO_USER' in ansible_env" }
