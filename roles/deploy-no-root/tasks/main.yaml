@@ -19,3 +19,14 @@
 
 - name: ./kube/config 文件赋o+r权限
   file: path={{ ansible_env['PWD'] }}/.kube/config mode="o+r"
+
+- name: 创建.helm 目录
+  file: name={{ item }} state=directory
+  with_items:
+  - "{{ ansible_env['PWD'] }}/.helm"
+
+- name: 复制helm key/ca 到家目录
+  shell: "cp /root/.helm/*.pem {{ ansible_env['PWD']}}/.helm/"
+
+- name: 修改 helm key/ca 属主
+  file: path={{ ansible_env['PWD']}}/.helm/*.pem owner={{ ansible_env['SUDO_USER'] }} group={{ ansible_env['SUDO_USER'] }}

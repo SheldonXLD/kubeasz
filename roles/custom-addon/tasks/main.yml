@@ -1,0 +1,48 @@
+- name: 在 deploy 节点创建相关目录
+  file: path={{ item }} state=directory
+  with_items:
+  - "{{ base_dir }}/charts"
+
+- name: 获取已下载的helm 包信息
+  command: "ls {{ base_dir}}/charts"
+  register: charts_info
+
+- block:
+  - name: 在 deploy 节点创建 prometheus 目录
+    file: path={{ item }} state=directory
+    with_items:
+    - "{{ base_dir }}/charts/prometheus"
+
+  - name: 尝试获取最新的prometheus (若执行失败，可忽略)
+    command: "helm fetch --untar --untardir {{ base_dir}}/charts/prometheus stable/prometheus"
+    when: "prometheus" not in charts_info.stdout
+
+  - name: 尝试获取最新的grafana (若执行失败，可忽略)
+    command: "helm fetch --untar --untardir {{ base_dir}}/charts/prometheus stable/grafana"
+    when: "grafana" not in charts_info.stdout
+
+  - name: 复制custom values
+    copy: src={{ item }} dest={{ base_dir}}/charts/prometheus/{{ item }}
+    with_items:
+    - grafana-dashboards.yaml
+    - grafana-settings.yaml
+    - prometheus-alertrules.yaml
+    - prometheus-alertsmanager.yaml
+    - prometheus-settings.yaml
+
+  - name: 安装 prometheus
+    shell: "cd {{ base_dir}}/charts/prometheus && helm install \
+            --name monitor \
+            --namespace {{ prometheus_namespace }}
+            -f prometheus-settings.yaml \
+            -f prometheus-alertsmanager.yaml \
+            -f prometheus-alertrules.yaml prometheus"
+
+  - name: 安装 grafana
+    shell: "cd {{ base_dir}}/charts/prometheus && helm install \
+            --name grafana
+            --namespace {{ prometheus_namespace }} \
+            -f grafana-settings.yaml \
+            -f grafana-dashboards.yaml grafana"
+
+  when: "prometheus_install" == "yes"

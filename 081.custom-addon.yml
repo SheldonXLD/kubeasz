@@ -1,0 +1,4 @@
+# install custom addon
+- hosts: deploy
+  roles:
+  - custom-addon
