@@ -3,4 +3,4 @@
   - kube-master
   - kube-node
   roles:
-  - { role: post_no_root, when: "'SUDO_USER' in ansible_env" }
+  - { role: post-no-root, when: "'SUDO_USER' in ansible_env" }

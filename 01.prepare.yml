@@ -7,7 +7,7 @@
 - hosts: deploy
   roles:
   - deploy
-  - { role: deploy_no_root, when: "'SUDO_USER' in ansible_env" }
+  - { role: deploy-no-root, when: "'SUDO_USER' in ansible_env" }
 
 # prepare tasks for all nodes
 - hosts:
